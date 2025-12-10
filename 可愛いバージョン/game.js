@@ -17,9 +17,9 @@ const helpCount = document.getElementById('help-count');
 
 // 2. オーディオ要素の作成
 const sounds = {
-    opening: new Audio('オープニング.mp3'),
+    opening: new Audio('オープニングカワイイ.mp3'),
     bgm: new Audio('POPBGM.mp3'),
-    ending: new Audio('エンディング.mp3'),
+    ending: new Audio('エンディングカワイイ.mp3'),
     cursor: new Audio('カーソル移動11.mp3'),
     decision: new Audio('決定ボタンを押す.mp3'),
     correct: new Audio('クイズ正解1.mp3'),
