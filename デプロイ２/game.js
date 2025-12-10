@@ -987,16 +987,13 @@ helpBtn.addEventListener('click', useHelp);
 let touchStartX = 0;
 let touchStartY = 0;
 let touchStartTime = 0;
-let lastTapTime = 0;
-let tapTimeout = null;
 let longPressTimeout = null;
-let longPressInterval = null;
 let isLongPressing = false;
-const SWIPE_THRESHOLD = 30; // スワイプ判定の最小距離
-const TAP_THRESHOLD = 10;   // タップ判定の最大移動距離
-const DOUBLE_TAP_DELAY = 150; // ダブルタップ判定時間（ms）
-const LONG_PRESS_DELAY = 300; // 長押し判定時間（ms）
-const LONG_PRESS_DROP_INTERVAL = 150; // 長押し中の落下間隔（ms）
+const SWIPE_THRESHOLD = 15; // スワイプ判定の最小距離（小さく=敏感に）
+const TAP_THRESHOLD = 8;    // タップ判定の最大移動距離
+const LONG_PRESS_DELAY = 350; // 長押し判定時間（ms）
+const MOVE_PER_PIXEL = 25;  // 何px横スワイプで1マス移動
+const DROP_PER_PIXEL = 20;  // 何px下スワイプで1マス落下
 
 function handleTouchControl(action) {
     if (!canControl || isGameOver || isGameCleared) return;
@@ -1029,13 +1026,10 @@ touchArea.addEventListener('touchstart', (e) => {
     touchStartTime = Date.now();
     isLongPressing = false;
 
-    // 長押し検出タイマー開始
+    // 長押し検出タイマー開始（長押しで即落下）
     longPressTimeout = setTimeout(() => {
         isLongPressing = true;
-        // 長押し中は連続で高速落下
-        longPressInterval = setInterval(() => {
-            handleTouchControl(() => softDrop());
-        }, LONG_PRESS_DROP_INTERVAL);
+        handleTouchControl(() => hardDrop());
     }, LONG_PRESS_DELAY);
 }, { passive: false });
 
@@ -1049,10 +1043,6 @@ touchArea.addEventListener('touchend', (e) => {
     if (longPressTimeout) {
         clearTimeout(longPressTimeout);
         longPressTimeout = null;
-    }
-    if (longPressInterval) {
-        clearInterval(longPressInterval);
-        longPressInterval = null;
     }
 
     // 長押し中だった場合はタップ処理しない
@@ -1069,42 +1059,18 @@ touchArea.addEventListener('touchend', (e) => {
     const touch = e.changedTouches[0];
     const deltaX = touch.clientX - touchStartX;
     const deltaY = touch.clientY - touchStartY;
-    const now = Date.now();
 
     const absX = Math.abs(deltaX);
     const absY = Math.abs(deltaY);
 
-    // タップ判定（移動距離が小さい場合）
+    // タップ判定（移動距離が小さい場合）→ 即座に回転
     if (absX < TAP_THRESHOLD && absY < TAP_THRESHOLD) {
-        // ダブルタップ判定
-        if (now - lastTapTime < DOUBLE_TAP_DELAY) {
-            // ダブルタップ：回転をキャンセルしてハードドロップ
-            if (tapTimeout) {
-                clearTimeout(tapTimeout);
-                tapTimeout = null;
-            }
-            handleTouchControl(() => hardDrop());
-            lastTapTime = 0;
-        } else {
-            // シングルタップ：少し待ってから回転（ダブルタップ待ち）
-            lastTapTime = now;
-            tapTimeout = setTimeout(() => {
-                handleTouchControl(() => playerRotate());
-                tapTimeout = null;
-            }, DOUBLE_TAP_DELAY);
-        }
+        handleTouchControl(() => playerRotate());
         return;
     }
 
-    // スワイプ判定（左右のみ）
-    if (absX > absY && absX > SWIPE_THRESHOLD) {
-        // 横スワイプ
-        if (deltaX > 0) {
-            handleTouchControl(() => playerMove(1));  // 右
-        } else {
-            handleTouchControl(() => playerMove(-1)); // 左
-        }
-    }
+    // 横スワイプ判定（touchmoveでリアルタイム処理されるが、念のため）
+    // 下スワイプはtouchmoveでリアルタイム処理済み
 }, { passive: false });
 
 // ハードドロップ（即座に着地）
@@ -1118,8 +1084,9 @@ function hardDrop() {
     dropCounter = 0;
 }
 
-// 連続スワイプ対応（指を動かしながら移動）
+// 連続スワイプ対応（指を動かしながらリアルタイム操作）
 let lastMoveX = 0;
+let lastMoveY = 0;
 touchArea.addEventListener('touchmove', (e) => {
     // クイズボタンやUIボタンはスキップ
     if (e.target.closest('.answer-btn, #help-btn, #back-to-title-btn')) return;
@@ -1136,29 +1103,42 @@ touchArea.addEventListener('touchmove', (e) => {
             clearTimeout(longPressTimeout);
             longPressTimeout = null;
         }
-        if (longPressInterval) {
-            clearInterval(longPressInterval);
-            longPressInterval = null;
-            isLongPressing = false;
-        }
+        isLongPressing = false;
     }
 
     if (!canControl || isGameOver || isGameCleared) return;
 
-    const moveStep = Math.floor(deltaX / 40); // 40px毎に1マス移動
-
-    if (moveStep !== lastMoveX) {
-        const diff = moveStep - lastMoveX;
+    // 左右移動（リアルタイム）
+    const moveStepX = Math.floor(deltaX / MOVE_PER_PIXEL);
+    if (moveStepX !== lastMoveX) {
+        const diff = moveStepX - lastMoveX;
         if (diff > 0) {
             handleTouchControl(() => playerMove(1));
         } else if (diff < 0) {
             handleTouchControl(() => playerMove(-1));
         }
-        lastMoveX = moveStep;
+        lastMoveX = moveStepX;
+    }
+
+    // 下落下（リアルタイム）
+    const moveStepY = Math.floor(deltaY / DROP_PER_PIXEL);
+    if (moveStepY > lastMoveY) {
+        const dropCount = moveStepY - lastMoveY;
+        handleTouchControl(() => {
+            for (let i = 0; i < dropCount; i++) {
+                if (!isColliding(currentPiece, 0, 1)) {
+                    currentPiece.y++;
+                } else {
+                    break;
+                }
+            }
+            dropCounter = 0;
+        });
+        lastMoveY = moveStepY;
     }
 }, { passive: false });
 
-touchArea.addEventListener('touchstart', () => { lastMoveX = 0; }, { passive: true });
+touchArea.addEventListener('touchstart', () => { lastMoveX = 0; lastMoveY = 0; }, { passive: true });
 
 // タッチボタン操作（スマホ用）
 const btnLeft = document.getElementById('btn-left');
