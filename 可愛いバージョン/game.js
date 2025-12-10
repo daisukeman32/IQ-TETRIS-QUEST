@@ -1040,8 +1040,12 @@ function gameClear() {
     const iq = calculateIQ();
     const comment = getIQComment(iq);
 
-    // 画面全体を黒で覆う（ドラクエ風）
-    ctx.fillStyle = '#000';
+    // 可愛いピンクグラデーション背景
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#FFE4EC');
+    gradient.addColorStop(0.5, '#FFF0F5');
+    gradient.addColorStop(1, '#F0E6FA');
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const centerX = canvas.width / 2;
@@ -1049,39 +1053,39 @@ function gameClear() {
 
     ctx.textAlign = 'center';
 
-    // 勝利メッセージ
-    ctx.fillStyle = '#ff0';
-    ctx.font = '20px "DotGothic16"';
-    ctx.fillText('★ VICTORY! ★', centerX, centerY - 160);
+    // 勝利メッセージ（可愛いピンク）
+    ctx.fillStyle = '#FF69B4';
+    ctx.font = 'bold 20px "Zen Maru Gothic", sans-serif';
+    ctx.fillText('♡ VICTORY! ♡', centerX, centerY - 160);
 
-    ctx.fillStyle = '#fff';
-    ctx.font = '16px "DotGothic16"';
+    ctx.fillStyle = '#5D4E6D';
+    ctx.font = '16px "Zen Maru Gothic", sans-serif';
     ctx.fillText(`${currentEnemy.name}をたおした！`, centerX, centerY - 120);
 
     // IQセクション
-    ctx.font = '14px "DotGothic16"';
-    ctx.fillStyle = '#fff';
+    ctx.font = '14px "Zen Maru Gothic", sans-serif';
+    ctx.fillStyle = '#8B7B9B';
     ctx.fillText('あなたのIQは...', centerX, centerY - 70);
 
-    // IQ数値を大きく表示
-    ctx.font = '60px "DotGothic16"';
-    ctx.fillStyle = '#ff0';
+    // IQ数値を大きく表示（ピンク）
+    ctx.font = 'bold 60px "Zen Maru Gothic", sans-serif';
+    ctx.fillStyle = '#FF1493';
     ctx.fillText(iq, centerX, centerY + 20);
 
     // コメント
-    ctx.font = '12px "DotGothic16"';
-    ctx.fillStyle = '#fff';
+    ctx.font = '12px "Zen Maru Gothic", sans-serif';
+    ctx.fillStyle = '#5D4E6D';
     ctx.fillText(comment, centerX, centerY + 70);
 
     // 統計情報
-    ctx.font = '11px "DotGothic16"';
-    ctx.fillStyle = '#fff';
+    ctx.font = '11px "Zen Maru Gothic", sans-serif';
+    ctx.fillStyle = '#8B7B9B';
     const accuracy = totalQuizCount > 0 ? Math.round((correctAnswerCount / totalQuizCount) * 100) : 0;
     ctx.fillText(`正解率: ${accuracy}%  間違い: ${wrongAnswerCount}回`, centerX, centerY + 110);
 
-    ctx.font = '12px "DotGothic16"';
-    ctx.fillStyle = '#fff';
-    ctx.fillText('タップでタイトルへ', centerX, centerY + 160);
+    ctx.font = '12px "Zen Maru Gothic", sans-serif';
+    ctx.fillStyle = '#FF69B4';
+    ctx.fillText('♡ タップでタイトルへ ♡', centerX, centerY + 160);
 }
 
 function gameOver() {
@@ -1099,8 +1103,12 @@ function gameOver() {
     const comment = getIQComment(iq);
     const remainingHpPercent = Math.round((enemyHp / enemyMaxHp) * 100);
 
-    // 画面全体を黒で覆う（ドラクエ風）
-    ctx.fillStyle = '#000';
+    // 可愛いピンク〜ラベンダーグラデーション背景
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#F0E6FA');
+    gradient.addColorStop(0.5, '#FFE4EC');
+    gradient.addColorStop(1, '#E8D5E7');
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const centerX = canvas.width / 2;
@@ -1108,43 +1116,43 @@ function gameOver() {
 
     ctx.textAlign = 'center';
 
-    // ゲームオーバー
-    ctx.fillStyle = '#f00';
-    ctx.font = '22px "DotGothic16"';
-    ctx.fillText('★ GAME OVER ★', centerX, centerY - 160);
+    // ゲームオーバー（可愛いけどちょっと残念な感じ）
+    ctx.fillStyle = '#DA70D6';
+    ctx.font = 'bold 22px "Zen Maru Gothic", sans-serif';
+    ctx.fillText('♡ GAME OVER ♡', centerX, centerY - 160);
 
-    ctx.fillStyle = '#fff';
-    ctx.font = '14px "DotGothic16"';
+    ctx.fillStyle = '#5D4E6D';
+    ctx.font = '14px "Zen Maru Gothic", sans-serif';
     ctx.fillText(`${currentEnemy.name}に敗北...`, centerX, centerY - 120);
 
-    ctx.fillStyle = '#fff';
-    ctx.font = '12px "DotGothic16"';
+    ctx.fillStyle = '#8B7B9B';
+    ctx.font = '12px "Zen Maru Gothic", sans-serif';
     ctx.fillText(`敵HP: ${remainingHpPercent}% 残り`, centerX, centerY - 95);
 
     // IQセクション
-    ctx.fillStyle = '#fff';
-    ctx.font = '14px "DotGothic16"';
+    ctx.fillStyle = '#8B7B9B';
+    ctx.font = '14px "Zen Maru Gothic", sans-serif';
     ctx.fillText('あなたのIQ', centerX, centerY - 50);
 
-    // IQ数値
-    ctx.font = '55px "DotGothic16"';
-    ctx.fillStyle = '#fff';
+    // IQ数値（ラベンダー色）
+    ctx.font = 'bold 55px "Zen Maru Gothic", sans-serif';
+    ctx.fillStyle = '#9370DB';
     ctx.fillText(iq, centerX, centerY + 25);
 
     // コメント
-    ctx.font = '12px "DotGothic16"';
-    ctx.fillStyle = '#fff';
+    ctx.font = '12px "Zen Maru Gothic", sans-serif';
+    ctx.fillStyle = '#5D4E6D';
     ctx.fillText(comment, centerX, centerY + 70);
 
     // 統計情報
-    ctx.font = '11px "DotGothic16"';
-    ctx.fillStyle = '#fff';
+    ctx.font = '11px "Zen Maru Gothic", sans-serif';
+    ctx.fillStyle = '#8B7B9B';
     const accuracy = totalQuizCount > 0 ? Math.round((correctAnswerCount / totalQuizCount) * 100) : 0;
     ctx.fillText(`正解率: ${accuracy}%  間違い: ${wrongAnswerCount}回`, centerX, centerY + 110);
 
-    ctx.font = '12px "DotGothic16"';
-    ctx.fillStyle = '#fff';
-    ctx.fillText('タップでタイトルへ', centerX, centerY + 155);
+    ctx.font = '12px "Zen Maru Gothic", sans-serif';
+    ctx.fillStyle = '#DA70D6';
+    ctx.fillText('♡ タップでタイトルへ ♡', centerX, centerY + 155);
 }
 
 function playSound(sound) {
@@ -1429,14 +1437,7 @@ function isColliding(piece, offsetX = 0, offsetY = 0) {
 // 9. 描画
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // 可愛いグリッド線（薄いピンク）
-    ctx.strokeStyle = 'rgba(255, 182, 193, 0.3)';
-    ctx.lineWidth = 1;
-    for (let x = 0; x < COLS; x++) {
-        for (let y = 0; y < ROWS; y++) {
-            ctx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-        }
-    }
+    // グリッド線なし（すっきり可愛く）
     drawBoard();
     if (!isGameOver && !isGameCleared) drawPiece();
 }
