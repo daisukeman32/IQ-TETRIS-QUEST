@@ -780,7 +780,7 @@ function startGame() {
     // ゲームBGMを開始
     playSound(sounds.bgm);
 
-    // 渦巻きエフェクト後にゲーム開始
+    // 夢の世界へ入るエフェクト後にゲーム開始
     battleTransition(() => {
         showGameScreen();
         newGame();
@@ -967,7 +967,7 @@ function handleAnswer(selectedOption) {
     }
 }
 
-// 敵の攻撃演出（間違え時のペナルティ）
+// 敵の攻撃演出（間違え時のペナルティ）- 可愛いバージョン
 function enemyAttack() {
     const enemyIcon = document.getElementById('enemy-icon');
     const gameContainer = document.getElementById('game-container');
@@ -976,28 +976,28 @@ function enemyAttack() {
     isAnswerDisabled = true;
     answersElement.classList.add('disabled');
 
-    // 敵アイコンを大きく光らせる
+    // 敵アイコンをぷるぷる＆ピンクに光らせる
     if (enemyIcon) {
-        enemyIcon.style.transform = 'scale(1.5)';
-        enemyIcon.style.filter = 'brightness(2) drop-shadow(0 0 10px red)';
+        enemyIcon.style.transform = 'scale(1.3)';
+        enemyIcon.style.filter = 'brightness(1.5) drop-shadow(0 0 15px #FF69B4)';
     }
 
-    // 画面ダメージ演出（瞬間的にガクッとズレる）
+    // 画面をふわっと揺らす（優しめ）
     if (gameContainer) {
         let shakeCount = 0;
         const shakeInterval = setInterval(() => {
-            const offsetX = (Math.random() - 0.5) * 20;
-            const offsetY = (Math.random() - 0.5) * 20;
+            const offsetX = (Math.random() - 0.5) * 8;
+            const offsetY = (Math.random() - 0.5) * 8;
             gameContainer.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
             shakeCount++;
-            if (shakeCount >= 6) {
+            if (shakeCount >= 4) {
                 clearInterval(shakeInterval);
                 gameContainer.style.transform = '';
             }
-        }, 50);
+        }, 60);
     }
 
-    // 赤フラッシュ
+    // ピンクフラッシュ
     document.body.classList.add('damage-flash');
 
     // 0.5秒後にエフェクトを解除
@@ -1074,13 +1074,13 @@ function updateEnemyDisplay() {
     if (enemyHpBarEl) {
         const hpPercent = (enemyHp / enemyMaxHp) * 100;
         enemyHpBarEl.style.width = `${hpPercent}%`;
-        // レトロRPG風（緑→黄→赤）
+        // 可愛いピンクグラデーション（ピンク→ラベンダー→薄紫）
         if (hpPercent > 50) {
-            enemyHpBarEl.style.background = '#00ff00';
+            enemyHpBarEl.style.background = 'linear-gradient(90deg, #FF69B4, #FF1493)';
         } else if (hpPercent > 25) {
-            enemyHpBarEl.style.background = '#ffff00';
+            enemyHpBarEl.style.background = 'linear-gradient(90deg, #DA70D6, #BA55D3)';
         } else {
-            enemyHpBarEl.style.background = '#ff0000';
+            enemyHpBarEl.style.background = 'linear-gradient(90deg, #9370DB, #8A2BE2)';
         }
     }
 }
