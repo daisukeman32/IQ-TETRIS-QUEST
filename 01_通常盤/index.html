@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IQ TETRIS QUEST</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Orbitron:wght@700;900&family=DotGothic16&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 音声トグルボタン（常に表示） -->
+    <button id="mute-btn" class="mute-btn">🔊</button>
+
+    <div id="splash-screen">
+        <div class="splash-content">
+            <img src="iqtetrisquestロゴ.png" alt="IQ TETRIS QUEST" class="splash-logo">
+            <p class="tap-text">▶ タップしてスタート ◀</p>
+        </div>
+    </div>
+    <div id="title-screen" class="hidden">
+        <div class="logo-container">
+            <img src="iqtetrisquestロゴ.png" alt="IQ TETRIS QUEST" class="title-logo">
+        </div>
+
+        <div class="settings-group">
+            <h2>▼ だれがプレイする？</h2>
+            <ul class="menu-list" id="audience-selector">
+                <li class="menu-item selected" data-value="lowerElem"><span class="cursor">▶</span>ていがくねん</li>
+                <li class="menu-item" data-value="upperElem"><span class="cursor">▶</span>こうがくねん</li>
+                <li class="menu-item" data-value="adult"><span class="cursor">▶</span>おとな</li>
+                <li class="menu-item extra" data-value="extra"><span class="cursor">▶</span>★ げきムズ</li>
+            </ul>
+        </div>
+
+        <div class="settings-group">
+            <h2>▼ むずかしさは？</h2>
+            <ul class="menu-list" id="speed-selector">
+                <li class="menu-item selected" data-value="easy"><span class="cursor">▶</span>かんたん</li>
+                <li class="menu-item" data-value="normal"><span class="cursor">▶</span>ふつう</li>
+                <li class="menu-item" data-value="hard"><span class="cursor">▶</span>むずかしい</li>
+                <li class="menu-item extra" data-value="extra"><span class="cursor">▶</span>★ げきムズ</li>
+            </ul>
+        </div>
+
+        <div class="menu-item rule-item" id="rule-btn">
+            <span class="cursor">▶</span>ルールをみる
+        </div>
+
+        <div class="menu-item start-item" id="start-btn">
+            <span class="cursor">▶</span>ぼうけんに でる
+        </div>
+    </div>
+
+    <div id="rule-screen" class="hidden">
+        <div class="rule-content">
+            <h1>ルール</h1>
+            <div class="rule-section">
+                <h2>★ あそびかた</h2>
+                <p>クイズに正解するとブロックを動かせるよ！</p>
+                <p>ラインを消して敵にダメージを与えよう！</p>
+            </div>
+            <div class="rule-section">
+                <h2>★ まちがえると...</h2>
+                <p>敵が攻撃してくる！</p>
+                <p>ブロックの落ちるスピードがUP！</p>
+            </div>
+            <div class="rule-section">
+                <h2>★ 高IQをめざすには</h2>
+                <p>敵をたおすとボーナス！</p>
+                <p>難しいモードほど高得点！</p>
+                <p>間違いを減らそう！</p>
+                <p>一度に複数ライン消すと大ダメージ！</p>
+                <p>運も実力のうち！</p>
+            </div>
+            <div class="menu-item back-item" id="back-to-title-from-rule">
+                <span class="cursor">▶</span>もどる
+            </div>
+        </div>
+    </div>
+
+    <div id="game-wrapper" class="hidden">
+        <div id="game-container">
+            <!-- 敵情報（スマホ時は最上部に配置） -->
+            <div id="enemy-container">
+                <div id="enemy-icon">😈</div>
+                <div id="enemy-info">
+                    <div id="enemy-name">デビル</div>
+                    <div id="enemy-hp-wrapper">
+                        <div id="enemy-hp-bar"></div>
+                    </div>
+                    <div id="enemy-hp">50 / 50</div>
+                </div>
+            </div>
+            <div id="game-area">
+                <canvas id="game-canvas"></canvas>
+                <!-- スマホ用タッチ操作ボタン -->
+                <div id="touch-controls">
+                    <button class="touch-btn" id="btn-left">◀</button>
+                    <button class="touch-btn" id="btn-rotate">↻</button>
+                    <button class="touch-btn" id="btn-down">▼</button>
+                    <button class="touch-btn" id="btn-right">▶</button>
+                </div>
+            </div>
+            <div id="ui-container">
+                <!-- PC用操作説明 -->
+                <div id="controls-info" class="controls-pc">
+                    <h3>操作方法</h3>
+                    <div class="control-item"><span class="key">←</span> 左に移動</div>
+                    <div class="control-item"><span class="key">→</span> 右に移動</div>
+                    <div class="control-item"><span class="key">↓</span> 落下</div>
+                    <div class="control-item"><span class="key">↑</span> 回転</div>
+                </div>
+                <div id="help-container">
+                    <span id="help-label">リセット</span>
+                    <button id="help-btn"><span class="switch-circle"></span></button>
+                    <span id="help-count">(1回)</span>
+                </div>
+                <div id="quiz-container">
+                    <p id="question"></p>
+                    <div id="answers"></div>
+                </div>
+                <button id="back-to-title-btn">タイトルへもどる</button>
+            </div>
+            <!-- スマホ用操作説明（スマホ時は最下部に配置） -->
+            <div id="controls-mobile">
+                <div class="control-item">左右:移動</div>
+                <div class="control-item">下:落下</div>
+                <div class="control-item">タップ:回転</div>
+                <div class="control-item">長押し:即落下</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
