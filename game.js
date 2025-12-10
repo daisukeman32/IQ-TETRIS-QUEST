@@ -1,4 +1,5 @@
 // 1. DOM要素の取得
+const splashScreen = document.getElementById('splash-screen');
 const titleScreen = document.getElementById('title-screen');
 const gameWrapper = document.getElementById('game-wrapper');
 const canvas = document.getElementById('game-canvas');
@@ -637,7 +638,10 @@ function init() {
     ctx.canvas.width = COLS * BLOCK_SIZE;
     ctx.canvas.height = ROWS * BLOCK_SIZE;
     setupTitleScreen();
-    showTitleScreen();
+
+    // スプラッシュ画面のクリックでゲーム開始
+    splashScreen.addEventListener('click', startFromSplash);
+    splashScreen.addEventListener('touchend', startFromSplash);
 
     // モバイル用リサイズ処理
     resizeCanvasForMobile();
@@ -645,6 +649,19 @@ function init() {
     window.addEventListener('orientationchange', () => {
         setTimeout(resizeCanvasForMobile, 100);
     });
+}
+
+function startFromSplash(e) {
+    e.preventDefault();
+    // イベントリスナーを削除（二重実行防止）
+    splashScreen.removeEventListener('click', startFromSplash);
+    splashScreen.removeEventListener('touchend', startFromSplash);
+
+    // スプラッシュ画面を非表示
+    splashScreen.classList.add('hidden');
+
+    // タイトル画面を表示してオープニングBGM再生
+    showTitleScreen();
 }
 
 function resizeCanvasForMobile() {
@@ -865,10 +882,14 @@ function updateEnemyDisplay() {
 function gameClear() {
     isGameCleared = true;
     sounds.bgm.pause();
+    sounds.bgm.currentTime = 0;
     cancelAnimationFrame(animationFrameId);
     animationFrameId = null;
     playSound(sounds.clear);
     setTimeout(() => playSound(sounds.congrats), 1500);
+    // エンディングBGM再生
+    sounds.ending.currentTime = 0;
+    sounds.ending.play().catch(() => {});
 
     // IQ計算
     const iq = calculateIQ();
@@ -921,8 +942,12 @@ function gameClear() {
 function gameOver() {
     isGameOver = true;
     sounds.bgm.pause();
+    sounds.bgm.currentTime = 0;
     cancelAnimationFrame(animationFrameId);
     animationFrameId = null;
+    // エンディングBGM再生
+    sounds.ending.currentTime = 0;
+    sounds.ending.play().catch(() => {});
 
     // IQ計算（ゲームオーバーでも表示）
     const iq = calculateIQ();
