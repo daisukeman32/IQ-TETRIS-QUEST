@@ -1,0 +1,545 @@
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap');
+
+:root {
+    --bg-color: #f4f7f9;
+    --primary-color: #4a90e2;
+    --primary-dark: #3a7bc8;
+    --secondary-color: #f5a623;
+    --secondary-dark: #d98f1e;
+    --text-color: #333;
+    --white-color: #fff;
+    --light-gray: #d3d3d3;
+    --border-radius: 12px;
+}
+
+body {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    background: #0a0a0a;
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* --- Title Screen --- */
+#title-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    padding: 40px;
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.main-title {
+    font-size: 3.5em;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin: 0;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
+
+.settings-group h2 {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.selector {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-selector {
+    font-family: inherit;
+    font-size: 1.1em;
+    font-weight: 700;
+    padding: 12px 25px;
+    border: 2px solid var(--light-gray);
+    background-color: var(--white-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-selector:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn-selector.selected {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border-color: var(--primary-color);
+}
+
+.btn-selector.extra {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border-color: #DAA520;
+    color: #333;
+}
+
+.btn-selector.extra.selected {
+    background: linear-gradient(135deg, #FF6347 0%, #DC143C 100%);
+    border-color: #B22222;
+    color: white;
+}
+
+#start-btn {
+    font-family: inherit;
+    font-size: 1.5em;
+    font-weight: 700;
+    padding: 15px 40px;
+    margin-top: 10px;
+    border: none;
+    background-color: var(--secondary-color);
+    color: var(--white-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#start-btn:hover {
+    background-color: var(--secondary-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+/* --- Game Wrapper --- */
+#game-wrapper {
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+}
+
+#game-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+#game-canvas {
+    border: 2px solid #B0C4DE;
+    background-color: #fdfdfd;
+    border-radius: 8px;
+}
+
+#ui-container {
+    width: 240px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* --- Controls Info --- */
+#controls-info {
+    background: linear-gradient(135deg, #e8f4fd 0%, #d4e8f7 100%);
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    border: 2px solid #b8d4e8;
+}
+
+#controls-info h3 {
+    margin: 0 0 6px 0;
+    font-size: 0.85em;
+    color: var(--primary-color);
+    text-align: center;
+}
+
+.control-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8em;
+    margin: 3px 0;
+}
+
+.key {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-weight: 700;
+    font-size: 0.9em;
+    box-shadow: 0 2px 0 #bbb;
+}
+
+#score-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: 500;
+    color: var(--primary-color);
+    background: linear-gradient(135deg, #fff9e6 0%, #fff3cc 100%);
+    padding: 8px 15px;
+    border-radius: var(--border-radius);
+    border: 2px solid #f5d77a;
+}
+
+.score-label {
+    font-size: 0.8em;
+    color: #888;
+}
+
+.score-value {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: #e67e22;
+}
+
+#score {
+    font-weight: 700;
+    color: #e74c3c;
+}
+
+#help-btn {
+    font-family: inherit;
+    font-size: 0.9em;
+    font-weight: 700;
+    padding: 10px 12px;
+    border-radius: var(--border-radius);
+    border: none;
+    background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 3px 0 #d4577a;
+}
+
+#help-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #d4577a;
+}
+#help-btn:disabled {
+    background: #d3d3d3;
+    color: #777;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+#quiz-container {
+    background: linear-gradient(135deg, #fffde7 0%, #fff8cc 100%);
+    padding: 12px;
+    border-radius: var(--border-radius);
+    border: 2px solid #f0e68c;
+    min-height: 220px;
+    box-sizing: border-box;
+}
+
+#question {
+    font-size: 0.95em;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    min-height: 40px;
+    line-height: 1.4;
+    color: #333;
+}
+
+#answers {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.answer-btn {
+    padding: 8px 10px;
+    font-size: 0.85em;
+    font-family: inherit;
+    font-weight: 500;
+    border: 2px solid #7ec8e8;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #e0f4ff 0%, #ADD8E6 100%);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.answer-btn:hover {
+    background: linear-gradient(135deg, #b8e8ff 0%, #87CEEB 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+.answer-btn:active { transform: scale(0.98); }
+
+#back-to-title-btn {
+    font-family: inherit;
+    font-size: 0.85em;
+    font-weight: 600;
+    padding: 8px;
+    border: 2px solid #bbb;
+    background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    color: #666;
+}
+
+#back-to-title-btn:hover {
+    background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+    border-color: #999;
+    color: #333;
+}
+
+/* --- Touch Controls (スマホ用) --- */
+#game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#touch-controls {
+    display: none; /* スワイプ操作に変更したため非表示 */
+}
+
+.touch-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    font-weight: bold;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4a90e2 0%, #3a7bc8 100%);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #2a5a8a;
+    transition: all 0.1s;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+.touch-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #2a5a8a;
+}
+
+/* --- Responsive Design --- */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 0;
+        margin: 0;
+        min-height: 100vh;
+        min-height: 100dvh;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* タイトル画面 */
+    #title-screen {
+        padding: 15px;
+        gap: 10px;
+        margin: 5px;
+        width: calc(100% - 10px);
+        max-width: 360px;
+        box-sizing: border-box;
+    }
+
+    .main-title {
+        font-size: 1.8em;
+    }
+
+    .settings-group h2 {
+        font-size: 0.95em;
+        margin-bottom: 8px;
+    }
+
+    .selector {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .btn-selector {
+        font-size: 0.7em;
+        padding: 7px 10px;
+    }
+
+    #start-btn {
+        font-size: 1em;
+        padding: 10px 20px;
+    }
+
+    /* ゲーム画面 - 縦レイアウト・一画面収まり */
+    #game-wrapper {
+        padding: 4px;
+        margin: 0;
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        max-width: 100vw;
+        box-sizing: border-box;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    #game-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        flex: 1;
+        display: flex;
+        min-height: 0;
+    }
+
+    /* UI を上に配置 */
+    #ui-container {
+        order: -1;
+        width: 100%;
+        max-width: 320px;
+        gap: 2px;
+        flex-shrink: 0;
+    }
+
+    #controls-info {
+        display: none;
+    }
+
+    /* スコアとお助けを同じ行に */
+    #ui-container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 4px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #score-container {
+        padding: 4px 10px;
+        flex-direction: row;
+        justify-content: center;
+        gap: 6px;
+        border-width: 1px;
+        flex: 0 0 auto;
+    }
+
+    .score-label {
+        font-size: 0.7em;
+    }
+
+    .score-value {
+        font-size: 0.9em;
+    }
+
+    #help-btn {
+        font-size: 0.7em;
+        padding: 4px 10px;
+        box-shadow: 0 2px 0 #d4577a;
+        flex: 0 0 auto;
+    }
+
+    #quiz-container {
+        width: 100%;
+        min-height: auto;
+        padding: 6px 8px;
+        border-width: 1px;
+    }
+
+    #question {
+        font-size: 0.75em;
+        min-height: auto;
+        margin: 0 0 4px 0;
+        line-height: 1.2;
+    }
+
+    #answers {
+        gap: 3px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .answer-btn {
+        padding: 5px 8px;
+        font-size: 0.65em;
+        flex: 0 0 auto;
+        border-width: 1px;
+    }
+
+    #back-to-title-btn {
+        display: none;
+    }
+
+    /* ゲームエリア */
+    #game-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 0;
+    }
+
+    #game-canvas {
+        width: auto !important;
+        height: auto !important;
+        max-height: calc(100vh - 180px);
+        max-height: calc(100dvh - 180px);
+        max-width: 90vw;
+        aspect-ratio: 10 / 20;
+    }
+
+    /* タッチコントロールはスワイプに変更したため非表示 */
+    #touch-controls {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .main-title {
+        font-size: 1.5em;
+    }
+
+    .btn-selector {
+        font-size: 0.65em;
+        padding: 6px 8px;
+    }
+
+    #game-canvas {
+        max-height: calc(100vh - 180px);
+        max-height: calc(100dvh - 180px);
+    }
+
+    #question {
+        font-size: 0.75em;
+    }
+
+    .answer-btn {
+        padding: 5px 8px;
+        font-size: 0.65em;
+    }
+}
+
+@media screen and (max-height: 600px) {
+    #game-canvas {
+        max-height: calc(100vh - 160px);
+        max-height: calc(100dvh - 160px);
+    }
+
+    #quiz-container {
+        padding: 4px 6px;
+    }
+
+    .answer-btn {
+        padding: 4px 6px;
+        font-size: 0.6em;
+    }
+}

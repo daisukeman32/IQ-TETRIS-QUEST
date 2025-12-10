@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IQテトリス</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="title-screen">
+        <h1 class="main-title">IQテトリス</h1>
+        
+        <div class="settings-group">
+            <h2>だれがプレイする？</h2>
+            <div class="selector" id="audience-selector">
+                <button class="btn-selector selected" data-value="lowerElem">低学年</button>
+                <button class="btn-selector" data-value="upperElem">高学年</button>
+                <button class="btn-selector" data-value="adult">おとな</button>
+                <button class="btn-selector extra" data-value="extra">👑激ムズ</button>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <h2>スピードは？</h2>
+            <div class="selector" id="speed-selector">
+                <button class="btn-selector selected" data-value="easy">かんたん</button>
+                <button class="btn-selector" data-value="normal">ふつう</button>
+                <button class="btn-selector" data-value="hard">むずかしい</button>
+            </div>
+        </div>
+
+        <button id="start-btn">ゲームスタート！</button>
+    </div>
+
+    <div id="game-wrapper" class="hidden">
+        <div id="game-container">
+            <div id="game-area">
+                <canvas id="game-canvas"></canvas>
+                <!-- スマホ用タッチ操作ボタン -->
+                <div id="touch-controls">
+                    <button class="touch-btn" id="btn-left">◀</button>
+                    <button class="touch-btn" id="btn-rotate">↻</button>
+                    <button class="touch-btn" id="btn-down">▼</button>
+                    <button class="touch-btn" id="btn-right">▶</button>
+                </div>
+            </div>
+            <div id="ui-container">
+                <div id="controls-info">
+                    <h3>操作方法</h3>
+                    <div class="control-item"><span class="key">←</span> 左に移動</div>
+                    <div class="control-item"><span class="key">→</span> 右に移動</div>
+                    <div class="control-item"><span class="key">↓</span> 落下</div>
+                    <div class="control-item"><span class="key">↑</span> 回転</div>
+                </div>
+                <div id="score-container">
+                    <div class="score-label">スコア</div>
+                    <div class="score-value"><span id="score">0</span> / 100</div>
+                </div>
+                <button id="help-btn">おたすけ (1回)</button>
+                <div id="quiz-container">
+                    <p id="question"></p>
+                    <div id="answers"></div>
+                </div>
+                <button id="back-to-title-btn">タイトルへもどる</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
