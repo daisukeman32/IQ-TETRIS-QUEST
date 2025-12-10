@@ -626,7 +626,7 @@ function showRuleScreen() {
 
 // 6. ゲームのメインロジック
 
-// 雷＋渦巻きバトル突入エフェクト（RPG風）
+// 夢の世界へ入るトランジション（可愛いディゾルブ）
 function battleTransition(callback) {
     const overlay = document.createElement('canvas');
     overlay.id = 'transition-overlay';
@@ -637,75 +637,136 @@ function battleTransition(callback) {
     overlay.width = window.innerWidth;
     overlay.height = window.innerHeight;
 
-    let phase = 0; // 0:雷フラッシュ, 1:渦エフェクト
-    let flashCount = 0;
-    let flashState = false;
-    let spiralProgress = 0;
-
+    let progress = 0;
     const centerX = overlay.width / 2;
     const centerY = overlay.height / 2;
 
-    // 雷フラッシュ
-    function doFlash() {
-        if (flashCount < 6) {
-            flashState = !flashState;
-            tCtx.fillStyle = flashState ? '#fff' : '#000';
-            tCtx.fillRect(0, 0, overlay.width, overlay.height);
-            flashCount++;
-            setTimeout(doFlash, flashState ? 50 : 80);
-        } else {
-            phase = 1;
-            tCtx.fillStyle = '#000';
-            tCtx.fillRect(0, 0, overlay.width, overlay.height);
-            doSpiralWipe();
-        }
+    // キラキラパーティクル
+    const particles = [];
+    for (let i = 0; i < 50; i++) {
+        particles.push({
+            x: Math.random() * overlay.width,
+            y: Math.random() * overlay.height,
+            size: Math.random() * 8 + 4,
+            speed: Math.random() * 2 + 1,
+            angle: Math.random() * Math.PI * 2,
+            twinkle: Math.random() * Math.PI * 2
+        });
     }
 
-    // 渦巻きワイプ（画面を回転しながら黒く塗りつぶす）
-    function doSpiralWipe() {
-        tCtx.fillStyle = '#000';
+    // ハートパーティクル
+    const hearts = [];
+    for (let i = 0; i < 15; i++) {
+        hearts.push({
+            x: Math.random() * overlay.width,
+            y: overlay.height + Math.random() * 100,
+            size: Math.random() * 15 + 10,
+            speed: Math.random() * 3 + 2,
+            wobble: Math.random() * Math.PI * 2
+        });
+    }
+
+    function drawHeart(x, y, size) {
+        tCtx.beginPath();
+        tCtx.moveTo(x, y + size / 4);
+        tCtx.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + size / 4);
+        tCtx.bezierCurveTo(x - size / 2, y + size / 2, x, y + size * 0.7, x, y + size);
+        tCtx.bezierCurveTo(x, y + size * 0.7, x + size / 2, y + size / 2, x + size / 2, y + size / 4);
+        tCtx.bezierCurveTo(x + size / 2, y, x, y, x, y + size / 4);
+        tCtx.fill();
+    }
+
+    function drawStar(x, y, size, alpha) {
+        tCtx.save();
+        tCtx.globalAlpha = alpha;
+        tCtx.fillStyle = '#fff';
+        tCtx.beginPath();
+        for (let i = 0; i < 4; i++) {
+            const angle = (i / 4) * Math.PI * 2 - Math.PI / 2;
+            const len = i % 2 === 0 ? size : size * 0.4;
+            if (i === 0) {
+                tCtx.moveTo(x + Math.cos(angle) * len, y + Math.sin(angle) * len);
+            } else {
+                tCtx.lineTo(x + Math.cos(angle) * len, y + Math.sin(angle) * len);
+            }
+            const angle2 = ((i + 0.5) / 4) * Math.PI * 2 - Math.PI / 2;
+            const len2 = size * 0.4;
+            tCtx.lineTo(x + Math.cos(angle2) * len2, y + Math.sin(angle2) * len2);
+        }
+        tCtx.closePath();
+        tCtx.fill();
+        tCtx.restore();
+    }
+
+    function animate() {
+        // ピンク〜ラベンダーグラデーション背景（徐々に濃く）
+        const alpha = Math.min(1, progress / 60);
+        const gradient = tCtx.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.max(overlay.width, overlay.height));
+        gradient.addColorStop(0, `rgba(255, 240, 245, ${alpha})`);
+        gradient.addColorStop(0.5, `rgba(255, 182, 193, ${alpha})`);
+        gradient.addColorStop(1, `rgba(230, 230, 250, ${alpha})`);
+        tCtx.fillStyle = gradient;
         tCtx.fillRect(0, 0, overlay.width, overlay.height);
 
-        // 渦巻き状に白い部分を残す
-        const maxAngle = spiralProgress * 0.15;
-        const segments = 8;
+        // キラキラ描画
+        particles.forEach(p => {
+            p.twinkle += 0.15;
+            p.y -= p.speed * 0.5;
+            p.x += Math.sin(p.angle) * 0.5;
+            p.angle += 0.02;
 
-        tCtx.save();
-        tCtx.translate(centerX, centerY);
+            if (p.y < -20) p.y = overlay.height + 20;
 
-        for (let i = 0; i < segments; i++) {
-            const baseAngle = (i / segments) * Math.PI * 2 + maxAngle;
-            const arcSize = Math.max(0, (Math.PI / segments) * (1 - spiralProgress / 60));
+            const twinkleAlpha = (Math.sin(p.twinkle) + 1) / 2 * alpha;
+            drawStar(p.x, p.y, p.size, twinkleAlpha);
+        });
 
-            if (arcSize > 0 && spiralProgress < 50) {
-                tCtx.fillStyle = '#fff';
-                tCtx.beginPath();
-                tCtx.moveTo(0, 0);
-                tCtx.arc(0, 0, Math.max(overlay.width, overlay.height), baseAngle, baseAngle + arcSize);
-                tCtx.closePath();
-                tCtx.fill();
-            }
+        // ハート描画（下から上に浮かぶ）
+        if (progress > 20) {
+            hearts.forEach(h => {
+                h.y -= h.speed;
+                h.wobble += 0.05;
+                const wobbleX = Math.sin(h.wobble) * 20;
+
+                tCtx.fillStyle = `rgba(255, 105, 180, ${alpha * 0.7})`;
+                drawHeart(h.x + wobbleX, h.y, h.size);
+            });
         }
 
-        tCtx.restore();
+        // 中央に光の円（夢への入口）
+        if (progress > 30) {
+            const circleProgress = (progress - 30) / 50;
+            const radius = circleProgress * Math.max(overlay.width, overlay.height) * 1.5;
 
-        spiralProgress += 2;
+            const lightGradient = tCtx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+            lightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+            lightGradient.addColorStop(0.3, 'rgba(255, 192, 203, 0.6)');
+            lightGradient.addColorStop(0.7, 'rgba(255, 182, 193, 0.3)');
+            lightGradient.addColorStop(1, 'rgba(255, 182, 193, 0)');
 
-        if (spiralProgress < 60) {
-            requestAnimationFrame(doSpiralWipe);
+            tCtx.fillStyle = lightGradient;
+            tCtx.beginPath();
+            tCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            tCtx.fill();
+        }
+
+        progress += 1.5;
+
+        if (progress < 80) {
+            requestAnimationFrame(animate);
         } else {
-            // 完全に黒
-            tCtx.fillStyle = '#000';
+            // 最後は白くフェードアウト
+            tCtx.fillStyle = 'rgba(255, 255, 255, 1)';
             tCtx.fillRect(0, 0, overlay.width, overlay.height);
             setTimeout(() => {
                 overlay.remove();
                 callback();
-            }, 200);
+            }, 300);
         }
     }
 
     // 開始
-    doFlash();
+    animate();
 }
 
 function startGame() {
