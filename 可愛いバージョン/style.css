@@ -320,89 +320,108 @@ body {
 
 /* --- Game Screen --- 可愛いバージョン */
 #game-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    background: linear-gradient(180deg, #FFF8FC 0%, #FFF0F5 100%);
+    border-radius: 25px;
+    box-shadow: 0 10px 40px rgba(255, 105, 180, 0.2);
     padding: 10px;
-    box-sizing: border-box;
-    overflow: hidden;
+    border: 4px solid var(--pink);
+    font-family: 'Zen Maru Gothic', sans-serif;
 }
 
 #game-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+        "canvas enemy"
+        "canvas ui";
+    grid-template-columns: auto 250px;
+    grid-template-rows: auto 1fr;
     gap: 10px;
-    max-width: 700px;
-    max-height: 95vh;
-    width: 100%;
-    background: linear-gradient(180deg, #FFF8FC 0%, #FFF0F5 100%);
-    border: 4px solid var(--pink);
-    border-radius: 25px;
-    padding: 10px;
-    box-sizing: border-box;
-    box-shadow: 0 10px 40px rgba(255, 105, 180, 0.2);
-    overflow: hidden;
 }
 
-/* 敵情報 - 可愛いバージョン */
+/* PC版：敵情報は右上 */
 #enemy-container {
-    grid-column: 1 / -1;
+    grid-area: enemy;
+}
+
+/* PC版：ゲームエリアは左側（2行分） */
+#game-area {
+    grid-area: canvas;
+}
+
+/* PC版：UIは右下 */
+#ui-container {
+    grid-area: ui;
+    width: 250px;
     display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* PC版：スマホ操作説明は非表示 */
+#controls-mobile {
+    display: none;
+}
+
+/* 敵キャラ表示 - 通常版と同じ構造 */
+#enemy-container {
+    display: flex;
+    flex-direction: row;
     align-items: center;
-    gap: 15px;
-    padding: 15px;
     background: linear-gradient(90deg, rgba(255,182,193,0.3), rgba(230,230,250,0.3));
-    border-radius: 20px;
+    padding: 8px 10px;
+    border-radius: 10px;
     border: 2px solid var(--pink);
+    flex-shrink: 0;
+    gap: 10px;
 }
 
 #enemy-icon {
-    font-size: 50px;
-    filter: drop-shadow(0 3px 8px rgba(255, 105, 180, 0.3));
-    transition: transform 0.3s, filter 0.3s;
+    font-size: 2.8em;
+    line-height: 1;
+    min-width: 50px;
+    text-align: center;
+    filter: drop-shadow(0 0 6px rgba(255,105,180,0.6));
 }
 
 #enemy-info {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
 }
 
 #enemy-name {
     font-family: 'Zen Maru Gothic', sans-serif;
-    font-size: 1.2em;
-    font-weight: 700;
+    font-size: 1em;
     color: var(--pink-dark);
-    margin-bottom: 5px;
+    font-weight: bold;
 }
 
 #enemy-hp-wrapper {
     width: 100%;
-    height: 20px;
+    height: 12px;
     background: #FFE4EC;
-    border-radius: 10px;
+    border-radius: 6px;
     overflow: hidden;
     border: 2px solid var(--pink);
 }
 
 #enemy-hp-bar {
-    height: 100%;
     width: 100%;
+    height: 100%;
     background: linear-gradient(90deg, #FF69B4, #FF1493);
-    border-radius: 8px;
-    transition: width 0.5s ease;
-    box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.5);
+    transition: width 0.3s ease;
+    border-radius: 4px;
 }
 
 #enemy-hp {
     font-family: 'Zen Maru Gothic', sans-serif;
-    font-size: 0.9em;
+    font-size: 0.75em;
     color: var(--text-dark);
-    margin-top: 5px;
-    text-align: right;
 }
 
-/* ゲームエリア - 可愛いバージョン */
+/* ゲームエリア - 通常版と同じ構造 */
 #game-area {
     display: flex;
     flex-direction: column;
@@ -410,12 +429,11 @@ body {
 }
 
 #game-canvas {
-    border: 4px solid var(--pink);
-    border-radius: 15px;
-    background: linear-gradient(180deg, #FFF0F5 0%, #FFE4EC 100%);
-    max-width: 100%;
-    height: auto;
-    box-shadow: inset 0 0 20px rgba(255, 182, 193, 0.3);
+    border: 2px solid var(--pink);
+    background-color: #FFF0F5;
+    border-radius: 8px;
+    box-shadow: none;
+    flex-shrink: 0;
 }
 
 /* タッチコントロール - 可愛いバージョン */
@@ -444,137 +462,156 @@ body {
     box-shadow: 0 2px 5px rgba(255, 105, 180, 0.3);
 }
 
-/* UI Container - 可愛いバージョン */
-#ui-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
+/* --- Controls Info --- 一番下に横並び（通常版と同じ配置） */
 #controls-info {
-    background: linear-gradient(145deg, #FFF8FC, #FFF0F5);
-    padding: 15px;
-    border-radius: 15px;
-    border: 2px solid var(--pink);
+    order: 99;
+    background: transparent;
+    padding: 2px 0;
+    border: none;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    margin-top: auto;
 }
 
 #controls-info h3 {
+    display: none;
+}
+
+.control-item {
     font-family: 'Zen Maru Gothic', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.5em;
     color: var(--pink-dark);
-    margin: 0 0 10px 0;
-    font-size: 1em;
 }
 
-#controls-info .control-item {
-    font-size: 0.9em;
-    margin: 5px 0;
-    color: var(--text-dark);
+.key {
+    font-size: 0.5em;
+    color: var(--pink-dark);
 }
 
-#controls-info .key {
-    display: inline-block;
-    background: linear-gradient(145deg, var(--pink), var(--lavender));
-    color: #fff;
-    padding: 3px 10px;
-    border-radius: 8px;
-    margin-right: 8px;
-    font-weight: 700;
-    box-shadow: 0 2px 5px rgba(255, 105, 180, 0.3);
-}
-
-/* ヘルプボタン - 可愛いバージョン */
+/* リセットボタン（スイッチ風）- 通常版と同じ構造 */
 #help-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 15px;
+    gap: 6px;
+    padding: 5px 8px;
     background: linear-gradient(145deg, #FFF8FC, #FFF0F5);
-    border-radius: 15px;
     border: 2px solid var(--pink);
+    border-radius: 10px;
+    flex-shrink: 0;
 }
 
 #help-label {
     font-family: 'Zen Maru Gothic', sans-serif;
-    font-weight: 700;
+    font-size: 0.75em;
     color: var(--pink-dark);
 }
 
 #help-btn {
-    width: 50px;
-    height: 28px;
-    border-radius: 14px;
-    border: 2px solid var(--pink);
+    width: 36px;
+    height: 20px;
+    border-radius: 10px;
+    border: 2px solid var(--pink-dark);
     background: #FFE4EC;
     cursor: pointer;
     position: relative;
-    transition: background 0.3s;
+    transition: all 0.2s;
+    padding: 0;
 }
 
 #help-btn .switch-circle {
+    display: block;
+    width: 12px;
+    height: 12px;
+    background: linear-gradient(145deg, var(--pink), var(--pink-dark));
+    border-radius: 50%;
     position: absolute;
     top: 2px;
     left: 2px;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: linear-gradient(145deg, var(--pink), var(--pink-dark));
-    transition: left 0.3s;
-    box-shadow: 0 2px 5px rgba(255, 105, 180, 0.3);
+    transition: all 0.2s;
+    box-shadow: 0 0 6px var(--pink-dark);
+}
+
+#help-btn:hover {
+    border-color: var(--pink-dark);
+    box-shadow: 0 0 8px var(--pink-dark);
 }
 
 #help-btn:active .switch-circle {
-    left: 24px;
+    left: 18px;
+}
+
+#help-btn:disabled {
+    border-color: #ccc;
+    background: #f0f0f0;
+    cursor: not-allowed;
+}
+
+#help-btn:disabled .switch-circle {
+    background: #ccc;
+    box-shadow: none;
 }
 
 #help-count {
     font-family: 'Zen Maru Gothic', sans-serif;
-    color: var(--text-light);
-    font-size: 0.9em;
+    font-size: 0.65em;
+    color: var(--pink-dark);
 }
 
-/* クイズコンテナ - 可愛いバージョン */
+/* クイズコンテナ - 通常版と同じ構造 */
 #quiz-container {
     background: linear-gradient(145deg, #FFF8FC, #FFF0F5);
-    padding: 15px;
-    border-radius: 15px;
+    padding: 12px;
+    border-radius: 10px;
     border: 2px solid var(--pink);
-    min-height: 150px;
+    flex: 1;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
 #question {
     font-family: 'Zen Maru Gothic', sans-serif;
-    font-size: 1.1em;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin: 0 0 15px 0;
+    font-size: 0.95em;
+    margin: 0 0 12px 0;
     line-height: 1.5;
+    color: var(--text-dark);
 }
 
 #answers {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    flex: 1;
 }
 
-#answers button {
+.answer-btn {
+    padding: 10px 12px;
+    font-size: 0.85em;
     font-family: 'Zen Maru Gothic', sans-serif;
-    font-size: 1em;
-    padding: 12px 15px;
     border: 2px solid var(--pink);
-    border-radius: 25px;
+    border-radius: 15px;
     background: linear-gradient(145deg, #FFF0F5, #FFE4EC);
     color: var(--text-dark);
     cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 3px 10px rgba(255, 105, 180, 0.2);
+    transition: all 0.1s;
+    text-align: left;
+    box-sizing: border-box;
 }
 
-#answers button:hover {
+.answer-btn:hover {
     background: linear-gradient(145deg, var(--pink), #FF69B4);
     color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+}
+
+.answer-btn:active {
+    background: var(--pink-dark);
 }
 
 #feedback {
@@ -584,23 +621,25 @@ body {
     color: var(--pink-dark);
 }
 
-/* タイトルに戻るボタン - 可愛いバージョン */
+/* タイトルに戻るボタン - 通常版と同じ構造 */
 #back-to-title-btn {
     font-family: 'Zen Maru Gothic', sans-serif;
-    font-size: 1em;
-    padding: 12px 20px;
-    border: 2px solid var(--pink);
-    border-radius: 25px;
+    font-size: 0.65em;
+    padding: 4px;
+    border: 1px solid var(--pink);
     background: linear-gradient(145deg, #FFF0F5, #FFE4EC);
-    color: var(--text-dark);
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 3px 10px rgba(255, 105, 180, 0.2);
+    transition: all 0.1s;
+    text-align: center;
+    color: var(--text-dark);
+    flex-shrink: 0;
 }
 
 #back-to-title-btn:hover {
-    background: linear-gradient(145deg, var(--pink), #FF69B4);
+    background: var(--pink);
     color: #fff;
+    border-color: var(--pink-dark);
 }
 
 /* スマホ用操作説明（PC時は非表示） */
