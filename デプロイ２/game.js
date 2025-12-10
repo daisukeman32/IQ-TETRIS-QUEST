@@ -1,6 +1,7 @@
 // 1. DOM要素の取得
 const splashScreen = document.getElementById('splash-screen');
 const titleScreen = document.getElementById('title-screen');
+const ruleScreen = document.getElementById('rule-screen');
 const gameWrapper = document.getElementById('game-wrapper');
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
@@ -39,7 +40,7 @@ const BLOCK_SIZE = 25;
 // レトロカラー（ファミコン風）
 const COLORS = [null, '#ff0000', '#0000ff', '#00ff00', '#ffff00', '#00ffff', '#ff00ff', '#ff8800'];
 const SHAPES = [[], [[1, 1, 1, 1]], [[1, 1], [1, 1]], [[0, 1, 0], [1, 1, 1]], [[0, 0, 1], [1, 1, 1]], [[1, 0, 0], [1, 1, 1]], [[0, 1, 1], [1, 1, 0]], [[1, 1, 0], [0, 1, 1]]];
-const speedSettings = { easy: 1200, normal: 800, hard: 500, extra: 250 };
+const speedSettings = { easy: 1200, normal: 800, hard: 500, extra: 350 };
 const MIN_DROP_INTERVAL = 150; // スピードの下限（これ以上速くならない）
 
 // 敵キャラ設定
@@ -364,6 +365,8 @@ const allQuizzes = {
 
 // 4. ゲームの状態に関する変数
 let board, currentPiece, currentQuiz, canControl, isGameOver, isGameCleared, feedbackElement, helpChances;
+let isAnswerDisabled = false; // 間違え時の回答不能フラグ
+let isMuted = false; // ミュート状態
 let dropCounter, dropInterval, lastTime, animationFrameId;
 let selectedAudience = 'lowerElem';
 let selectedSpeed = 'easy';
@@ -491,9 +494,10 @@ function showTitleScreen() {
     sounds.ending.pause();
     sounds.ending.currentTime = 0;
     // オープニングBGM再生
-    sounds.opening.play().catch(() => {});
+    if (!isMuted) sounds.opening.play().catch(() => {});
 
     titleScreen.classList.remove('hidden');
+    ruleScreen.classList.add('hidden');
     gameWrapper.classList.add('hidden');
     if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
@@ -530,6 +534,16 @@ function setupTitleScreen() {
     });
     startBtn.addEventListener('click', startGame);
     backToTitleBtn.addEventListener('click', showTitleScreen);
+
+    // ルール画面
+    document.getElementById('rule-btn').addEventListener('click', showRuleScreen);
+    document.getElementById('back-to-title-from-rule').addEventListener('click', showTitleScreen);
+}
+
+function showRuleScreen() {
+    playSound(sounds.cursor);
+    titleScreen.classList.add('hidden');
+    ruleScreen.classList.remove('hidden');
 }
 
 // 6. ゲームのメインロジック
@@ -642,6 +656,9 @@ function init() {
     // スプラッシュ画面のクリックでゲーム開始
     splashScreen.addEventListener('click', startFromSplash);
     splashScreen.addEventListener('touchend', startFromSplash);
+
+    // ミュートボタン
+    document.getElementById('mute-btn').addEventListener('click', toggleMute);
 
     // モバイル用リサイズ処理
     resizeCanvasForMobile();
@@ -787,7 +804,7 @@ function newQuiz() {
 }
 
 function handleAnswer(selectedOption) {
-    if (canControl || isGameOver || isGameCleared) return;
+    if (canControl || isGameOver || isGameCleared || isAnswerDisabled) return;
     if (selectedOption === currentQuiz.a) {
         playSound(sounds.correct);
         canControl = true;
@@ -796,15 +813,65 @@ function handleAnswer(selectedOption) {
         quizContainer.style.pointerEvents = 'none';
         feedbackElement.textContent = '';
 
-        // 10問正解ごとにスピードアップ
-        if (correctAnswerCount % 10 === 0 && dropInterval > MIN_DROP_INTERVAL) {
-            dropInterval = Math.max(MIN_DROP_INTERVAL, dropInterval - 100);
-        }
     } else {
         playSound(sounds.wrong);
         wrongAnswerCount++;
         feedbackElement.textContent = 'まちがい！もう一度！';
+
+        // ペナルティ：少しスピードアップ
+        if (dropInterval > MIN_DROP_INTERVAL) {
+            dropInterval = Math.max(MIN_DROP_INTERVAL, dropInterval - 30);
+        }
+
+        // 敵の攻撃演出
+        enemyAttack();
     }
+}
+
+// 敵の攻撃演出（間違え時のペナルティ）
+function enemyAttack() {
+    const enemyIcon = document.getElementById('enemy-icon');
+    const gameContainer = document.getElementById('game-container');
+
+    // 回答を0.5秒間無効化
+    isAnswerDisabled = true;
+    answersElement.classList.add('disabled');
+
+    // 敵アイコンを大きく光らせる
+    if (enemyIcon) {
+        enemyIcon.style.transform = 'scale(1.5)';
+        enemyIcon.style.filter = 'brightness(2) drop-shadow(0 0 10px red)';
+    }
+
+    // 画面ダメージ演出（瞬間的にガクッとズレる）
+    if (gameContainer) {
+        let shakeCount = 0;
+        const shakeInterval = setInterval(() => {
+            const offsetX = (Math.random() - 0.5) * 20;
+            const offsetY = (Math.random() - 0.5) * 20;
+            gameContainer.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+            shakeCount++;
+            if (shakeCount >= 6) {
+                clearInterval(shakeInterval);
+                gameContainer.style.transform = '';
+            }
+        }, 50);
+    }
+
+    // 赤フラッシュ
+    document.body.classList.add('damage-flash');
+
+    // 0.5秒後にエフェクトを解除
+    setTimeout(() => {
+        isAnswerDisabled = false;
+        answersElement.classList.remove('disabled');
+        document.body.classList.remove('damage-flash');
+
+        if (enemyIcon) {
+            enemyIcon.style.transform = '';
+            enemyIcon.style.filter = '';
+        }
+    }, 500);
 }
 
 function useHelp() {
@@ -889,7 +956,7 @@ function gameClear() {
     setTimeout(() => playSound(sounds.congrats), 1500);
     // エンディングBGM再生
     sounds.ending.currentTime = 0;
-    sounds.ending.play().catch(() => {});
+    if (!isMuted) sounds.ending.play().catch(() => {});
 
     // IQ計算
     const iq = calculateIQ();
@@ -947,7 +1014,7 @@ function gameOver() {
     animationFrameId = null;
     // エンディングBGM再生
     sounds.ending.currentTime = 0;
-    sounds.ending.play().catch(() => {});
+    if (!isMuted) sounds.ending.play().catch(() => {});
 
     // IQ計算（ゲームオーバーでも表示）
     const iq = calculateIQ();
@@ -1003,11 +1070,37 @@ function gameOver() {
 }
 
 function playSound(sound) {
-    if (!sound) return;
+    if (!sound || isMuted) return;
     sound.currentTime = 0;
     sound.play().catch(error => {
         console.error(`Audio playback failed: ${error.message}`);
     });
+}
+
+// ミュートトグル機能
+function toggleMute() {
+    isMuted = !isMuted;
+    const muteBtn = document.getElementById('mute-btn');
+
+    if (isMuted) {
+        // 全ての音声を停止
+        Object.values(sounds).forEach(sound => {
+            sound.pause();
+        });
+        muteBtn.textContent = '🔇';
+        muteBtn.classList.add('muted');
+    } else {
+        muteBtn.textContent = '🔊';
+        muteBtn.classList.remove('muted');
+        // 現在の画面に応じてBGMを再生
+        if (!titleScreen.classList.contains('hidden')) {
+            sounds.opening.play().catch(() => {});
+        } else if (!gameWrapper.classList.contains('hidden') && !isGameOver && !isGameCleared) {
+            sounds.bgm.play().catch(() => {});
+        } else if (isGameOver || isGameCleared) {
+            sounds.ending.play().catch(() => {});
+        }
+    }
 }
 
 // 7. プレイヤー操作とイベントリスナー

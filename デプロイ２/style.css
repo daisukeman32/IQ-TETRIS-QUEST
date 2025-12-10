@@ -29,6 +29,35 @@ body {
     display: none !important;
 }
 
+/* ミュートボタン */
+.mute-btn {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 10000;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    background: rgba(0, 0, 0, 0.7);
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.mute-btn:hover {
+    transform: scale(1.1);
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.mute-btn:active {
+    transform: scale(0.95);
+}
+
+.mute-btn.muted {
+    background: rgba(100, 0, 0, 0.7);
+}
+
 /* --- Splash Screen --- */
 #splash-screen {
     position: fixed;
@@ -76,6 +105,37 @@ body {
 @keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.3; }
+}
+
+/* 敵攻撃時の画面揺れ */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.screen-shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* ダメージフラッシュ */
+.damage-flash {
+    animation: damageFlash 0.5s ease-out;
+}
+
+@keyframes damageFlash {
+    0% { background-color: rgba(255, 0, 0, 0.5); }
+    100% { background-color: transparent; }
+}
+
+/* 回答ボタン無効時のスタイル */
+#answers.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+#answers.disabled button {
+    cursor: not-allowed;
 }
 
 /* --- Title Screen --- ドラクエ風 */
@@ -144,6 +204,58 @@ body {
     font-size: 1.2em;
     color: #fff;
     margin-bottom: 12px;
+}
+
+/* ルール画面 */
+#rule-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.rule-content {
+    background: #000;
+    border: 4px solid #fff;
+    padding: 30px;
+    width: 380px;
+    font-family: 'DotGothic16', sans-serif;
+    text-align: center;
+}
+
+.rule-content h1 {
+    color: #ff0;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+}
+
+.rule-section {
+    margin: 15px 0;
+    text-align: left;
+    padding: 10px;
+    border: 1px solid #555;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.rule-section h2 {
+    color: #ff0;
+    font-size: 1em;
+    margin-bottom: 8px;
+}
+
+.rule-section p {
+    color: #fff;
+    font-size: 0.9em;
+    margin: 5px 0;
+    padding-left: 1em;
+}
+
+.rule-item {
+    margin-top: 15px;
+}
+
+.back-item {
+    margin-top: 20px;
 }
 
 /* RPGカーソル選択メニュー */
