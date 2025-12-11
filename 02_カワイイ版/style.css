@@ -462,6 +462,101 @@ body {
     box-shadow: 0 2px 5px rgba(255, 105, 180, 0.3);
 }
 
+/* --- Result Screen (結果画面オーバーレイ) --- */
+#result-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 182, 193, 0.98) 0%, rgba(255, 218, 233, 0.98) 100%);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+#result-screen.hidden {
+    display: none;
+}
+
+.result-content {
+    text-align: center;
+    color: var(--text-dark);
+    font-family: 'Zen Maru Gothic', sans-serif;
+    padding: 20px;
+    max-width: 90%;
+}
+
+#result-title {
+    font-size: 1.8em;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(255, 105, 180, 0.3);
+}
+
+#result-title.clear {
+    color: #FF69B4;
+}
+
+#result-title.gameover {
+    color: #E91E63;
+}
+
+#result-subtitle {
+    font-size: 1em;
+    margin-bottom: 5px;
+    color: var(--text-dark);
+}
+
+#result-enemy-hp {
+    font-size: 0.85em;
+    color: #888;
+    margin-bottom: 30px;
+}
+
+.result-iq-section {
+    margin: 30px 0;
+}
+
+.result-label {
+    font-size: 1em;
+    color: var(--pink-dark);
+    margin-bottom: 10px;
+}
+
+.result-iq-number {
+    font-size: 4em;
+    font-weight: bold;
+    color: #FF69B4;
+    text-shadow: 0 2px 10px rgba(255, 105, 180, 0.5);
+    margin: 10px 0;
+}
+
+.result-comment {
+    font-size: 0.9em;
+    color: var(--text-dark);
+    margin-top: 10px;
+}
+
+.result-stats {
+    font-size: 0.8em;
+    color: #888;
+    margin: 20px 0;
+}
+
+.result-tap {
+    font-size: 0.9em;
+    color: var(--pink-dark);
+    margin-top: 40px;
+    animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
 /* --- Controls Info --- 一番下に横並び（通常版と同じ配置） */
 #controls-info {
     order: 99;
@@ -875,14 +970,19 @@ body {
         min-height: 44px;
     }
 
-    /* タイトルへ戻る */
+    /* タイトルへ戻る（モバイル：左上固定） */
     #back-to-title-btn {
-        font-size: 0.6em;
-        padding: 6px;
-        border: 1px solid var(--pink);
-        flex-shrink: 0;
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 10000;
+        font-size: 0.55em;
+        padding: 8px 10px;
+        border: 2px solid var(--pink);
+        border-radius: 12px;
+        background: rgba(255, 240, 245, 0.95);
+        box-shadow: 0 2px 8px rgba(255, 105, 180, 0.3);
         box-sizing: border-box;
-        border-radius: 8px;
     }
 
     /* 操作説明（下部・全幅・上寄せ） */

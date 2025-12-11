@@ -2,6 +2,7 @@
 const splashScreen = document.getElementById('splash-screen');
 const titleScreen = document.getElementById('title-screen');
 const ruleScreen = document.getElementById('rule-screen');
+const resultScreen = document.getElementById('result-screen');
 const gameWrapper = document.getElementById('game-wrapper');
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
@@ -499,6 +500,7 @@ function showTitleScreen() {
     titleScreen.classList.remove('hidden');
     ruleScreen.classList.add('hidden');
     gameWrapper.classList.add('hidden');
+    resultScreen.classList.add('hidden');
     if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
@@ -534,6 +536,9 @@ function setupTitleScreen() {
     });
     startBtn.addEventListener('click', startGame);
     backToTitleBtn.addEventListener('click', showTitleScreen);
+
+    // 結果画面クリックでタイトルへ
+    resultScreen.addEventListener('click', showTitleScreen);
 
     // ルール画面
     document.getElementById('rule-btn').addEventListener('click', showRuleScreen);
@@ -946,6 +951,39 @@ function updateEnemyDisplay() {
     }
 }
 
+// 結果画面オーバーレイ表示
+function showResultScreen(isVictory) {
+    const iq = calculateIQ();
+    const comment = getIQComment(iq);
+    const accuracy = totalQuizCount > 0 ? Math.round((correctAnswerCount / totalQuizCount) * 100) : 0;
+
+    const titleEl = document.getElementById('result-title');
+    const subtitleEl = document.getElementById('result-subtitle');
+    const enemyHpEl = document.getElementById('result-enemy-hp');
+    const iqEl = document.getElementById('result-iq');
+    const commentEl = document.getElementById('result-comment');
+    const statsEl = document.getElementById('result-stats');
+
+    if (isVictory) {
+        titleEl.textContent = '★ VICTORY! ★';
+        titleEl.className = 'clear';
+        subtitleEl.textContent = `${currentEnemy.name}をたおした！`;
+        enemyHpEl.textContent = '';
+    } else {
+        titleEl.textContent = '★ GAME OVER ★';
+        titleEl.className = 'gameover';
+        subtitleEl.textContent = `${currentEnemy.name}に敗北...`;
+        const remainingHpPercent = Math.round((enemyHp / enemyMaxHp) * 100);
+        enemyHpEl.textContent = `敵HP: ${remainingHpPercent}% 残り`;
+    }
+
+    iqEl.textContent = iq;
+    commentEl.textContent = comment;
+    statsEl.textContent = `正解率: ${accuracy}%  間違い: ${wrongAnswerCount}回`;
+
+    resultScreen.classList.remove('hidden');
+}
+
 function gameClear() {
     isGameCleared = true;
     sounds.bgm.pause();
@@ -958,52 +996,8 @@ function gameClear() {
     sounds.ending.currentTime = 0;
     if (!isMuted) sounds.ending.play().catch(() => {});
 
-    // IQ計算
-    const iq = calculateIQ();
-    const comment = getIQComment(iq);
-
-    // 画面全体を黒で覆う（ドラクエ風）
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-
-    ctx.textAlign = 'center';
-
-    // 勝利メッセージ
-    ctx.fillStyle = '#ff0';
-    ctx.font = '20px "DotGothic16"';
-    ctx.fillText('★ VICTORY! ★', centerX, centerY - 160);
-
-    ctx.fillStyle = '#fff';
-    ctx.font = '16px "DotGothic16"';
-    ctx.fillText(`${currentEnemy.name}をたおした！`, centerX, centerY - 120);
-
-    // IQセクション
-    ctx.font = '14px "DotGothic16"';
-    ctx.fillStyle = '#fff';
-    ctx.fillText('あなたのIQは...', centerX, centerY - 70);
-
-    // IQ数値を大きく表示
-    ctx.font = '60px "DotGothic16"';
-    ctx.fillStyle = '#ff0';
-    ctx.fillText(iq, centerX, centerY + 20);
-
-    // コメント
-    ctx.font = '12px "DotGothic16"';
-    ctx.fillStyle = '#fff';
-    ctx.fillText(comment, centerX, centerY + 70);
-
-    // 統計情報
-    ctx.font = '11px "DotGothic16"';
-    ctx.fillStyle = '#fff';
-    const accuracy = totalQuizCount > 0 ? Math.round((correctAnswerCount / totalQuizCount) * 100) : 0;
-    ctx.fillText(`正解率: ${accuracy}%  間違い: ${wrongAnswerCount}回`, centerX, centerY + 110);
-
-    ctx.font = '12px "DotGothic16"';
-    ctx.fillStyle = '#fff';
-    ctx.fillText('タップでタイトルへ', centerX, centerY + 160);
+    // 結果画面オーバーレイ表示
+    showResultScreen(true);
 }
 
 function gameOver() {
@@ -1016,57 +1010,8 @@ function gameOver() {
     sounds.ending.currentTime = 0;
     if (!isMuted) sounds.ending.play().catch(() => {});
 
-    // IQ計算（ゲームオーバーでも表示）
-    const iq = calculateIQ();
-    const comment = getIQComment(iq);
-    const remainingHpPercent = Math.round((enemyHp / enemyMaxHp) * 100);
-
-    // 画面全体を黒で覆う（ドラクエ風）
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-
-    ctx.textAlign = 'center';
-
-    // ゲームオーバー
-    ctx.fillStyle = '#f00';
-    ctx.font = '22px "DotGothic16"';
-    ctx.fillText('★ GAME OVER ★', centerX, centerY - 160);
-
-    ctx.fillStyle = '#fff';
-    ctx.font = '14px "DotGothic16"';
-    ctx.fillText(`${currentEnemy.name}に敗北...`, centerX, centerY - 120);
-
-    ctx.fillStyle = '#fff';
-    ctx.font = '12px "DotGothic16"';
-    ctx.fillText(`敵HP: ${remainingHpPercent}% 残り`, centerX, centerY - 95);
-
-    // IQセクション
-    ctx.fillStyle = '#fff';
-    ctx.font = '14px "DotGothic16"';
-    ctx.fillText('あなたのIQ', centerX, centerY - 50);
-
-    // IQ数値
-    ctx.font = '55px "DotGothic16"';
-    ctx.fillStyle = '#fff';
-    ctx.fillText(iq, centerX, centerY + 25);
-
-    // コメント
-    ctx.font = '12px "DotGothic16"';
-    ctx.fillStyle = '#fff';
-    ctx.fillText(comment, centerX, centerY + 70);
-
-    // 統計情報
-    ctx.font = '11px "DotGothic16"';
-    ctx.fillStyle = '#fff';
-    const accuracy = totalQuizCount > 0 ? Math.round((correctAnswerCount / totalQuizCount) * 100) : 0;
-    ctx.fillText(`正解率: ${accuracy}%  間違い: ${wrongAnswerCount}回`, centerX, centerY + 110);
-
-    ctx.font = '12px "DotGothic16"';
-    ctx.fillStyle = '#fff';
-    ctx.fillText('タップでタイトルへ', centerX, centerY + 155);
+    // 結果画面オーバーレイ表示
+    showResultScreen(false);
 }
 
 function playSound(sound) {

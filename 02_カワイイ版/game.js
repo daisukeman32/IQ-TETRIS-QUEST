@@ -2,6 +2,7 @@
 const splashScreen = document.getElementById('splash-screen');
 const titleScreen = document.getElementById('title-screen');
 const ruleScreen = document.getElementById('rule-screen');
+const resultScreen = document.getElementById('result-screen');
 const gameWrapper = document.getElementById('game-wrapper');
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
@@ -534,6 +535,7 @@ function showTitleScreen() {
     titleScreen.classList.remove('hidden');
     ruleScreen.classList.add('hidden');
     gameWrapper.classList.add('hidden');
+    resultScreen.classList.add('hidden');
     if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
@@ -569,6 +571,9 @@ function setupTitleScreen() {
     });
     startBtn.addEventListener('click', startGame);
     backToTitleBtn.addEventListener('click', showTitleScreen);
+
+    // 結果画面クリックでタイトルへ
+    resultScreen.addEventListener('click', showTitleScreen);
 
     // ルール画面
     document.getElementById('rule-btn').addEventListener('click', showRuleScreen);
@@ -1042,6 +1047,39 @@ function updateEnemyDisplay() {
     }
 }
 
+// 結果画面オーバーレイ表示
+function showResultScreen(isVictory) {
+    const iq = calculateIQ();
+    const comment = getIQComment(iq);
+    const accuracy = totalQuizCount > 0 ? Math.round((correctAnswerCount / totalQuizCount) * 100) : 0;
+
+    const titleEl = document.getElementById('result-title');
+    const subtitleEl = document.getElementById('result-subtitle');
+    const enemyHpEl = document.getElementById('result-enemy-hp');
+    const iqEl = document.getElementById('result-iq');
+    const commentEl = document.getElementById('result-comment');
+    const statsEl = document.getElementById('result-stats');
+
+    if (isVictory) {
+        titleEl.textContent = '♡ VICTORY! ♡';
+        titleEl.className = 'clear';
+        subtitleEl.textContent = `${currentEnemy.name}をたおした！`;
+        enemyHpEl.textContent = '';
+    } else {
+        titleEl.textContent = '♡ GAME OVER ♡';
+        titleEl.className = 'gameover';
+        subtitleEl.textContent = `${currentEnemy.name}に敗北...`;
+        const remainingHpPercent = Math.round((enemyHp / enemyMaxHp) * 100);
+        enemyHpEl.textContent = `敵HP: ${remainingHpPercent}% 残り`;
+    }
+
+    iqEl.textContent = iq;
+    commentEl.textContent = comment;
+    statsEl.textContent = `正解率: ${accuracy}%  間違い: ${wrongAnswerCount}回`;
+
+    resultScreen.classList.remove('hidden');
+}
+
 function gameClear() {
     isGameCleared = true;
     sounds.bgm.pause();
@@ -1054,56 +1092,8 @@ function gameClear() {
     sounds.ending.currentTime = 0;
     if (!isMuted) sounds.ending.play().catch(() => {});
 
-    // IQ計算
-    const iq = calculateIQ();
-    const comment = getIQComment(iq);
-
-    // 可愛いピンクグラデーション背景
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#FFE4EC');
-    gradient.addColorStop(0.5, '#FFF0F5');
-    gradient.addColorStop(1, '#F0E6FA');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-
-    ctx.textAlign = 'center';
-
-    // 勝利メッセージ（可愛いピンク）
-    ctx.fillStyle = '#FF69B4';
-    ctx.font = 'bold 20px "Zen Maru Gothic", sans-serif';
-    ctx.fillText('♡ VICTORY! ♡', centerX, centerY - 160);
-
-    ctx.fillStyle = '#5D4E6D';
-    ctx.font = '16px "Zen Maru Gothic", sans-serif';
-    ctx.fillText(`${currentEnemy.name}をたおした！`, centerX, centerY - 120);
-
-    // IQセクション
-    ctx.font = '14px "Zen Maru Gothic", sans-serif';
-    ctx.fillStyle = '#8B7B9B';
-    ctx.fillText('あなたのIQは...', centerX, centerY - 70);
-
-    // IQ数値を大きく表示（ピンク）
-    ctx.font = 'bold 60px "Zen Maru Gothic", sans-serif';
-    ctx.fillStyle = '#FF1493';
-    ctx.fillText(iq, centerX, centerY + 20);
-
-    // コメント
-    ctx.font = '12px "Zen Maru Gothic", sans-serif';
-    ctx.fillStyle = '#5D4E6D';
-    ctx.fillText(comment, centerX, centerY + 70);
-
-    // 統計情報
-    ctx.font = '11px "Zen Maru Gothic", sans-serif';
-    ctx.fillStyle = '#8B7B9B';
-    const accuracy = totalQuizCount > 0 ? Math.round((correctAnswerCount / totalQuizCount) * 100) : 0;
-    ctx.fillText(`正解率: ${accuracy}%  間違い: ${wrongAnswerCount}回`, centerX, centerY + 110);
-
-    ctx.font = '12px "Zen Maru Gothic", sans-serif';
-    ctx.fillStyle = '#FF69B4';
-    ctx.fillText('♡ タップでタイトルへ ♡', centerX, centerY + 160);
+    // 結果画面オーバーレイ表示
+    showResultScreen(true);
 }
 
 function gameOver() {
@@ -1116,61 +1106,8 @@ function gameOver() {
     sounds.ending.currentTime = 0;
     if (!isMuted) sounds.ending.play().catch(() => {});
 
-    // IQ計算（ゲームオーバーでも表示）
-    const iq = calculateIQ();
-    const comment = getIQComment(iq);
-    const remainingHpPercent = Math.round((enemyHp / enemyMaxHp) * 100);
-
-    // 可愛いピンク〜ラベンダーグラデーション背景
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#F0E6FA');
-    gradient.addColorStop(0.5, '#FFE4EC');
-    gradient.addColorStop(1, '#E8D5E7');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-
-    ctx.textAlign = 'center';
-
-    // ゲームオーバー（可愛いけどちょっと残念な感じ）
-    ctx.fillStyle = '#DA70D6';
-    ctx.font = 'bold 22px "Zen Maru Gothic", sans-serif';
-    ctx.fillText('♡ GAME OVER ♡', centerX, centerY - 160);
-
-    ctx.fillStyle = '#5D4E6D';
-    ctx.font = '14px "Zen Maru Gothic", sans-serif';
-    ctx.fillText(`${currentEnemy.name}に敗北...`, centerX, centerY - 120);
-
-    ctx.fillStyle = '#8B7B9B';
-    ctx.font = '12px "Zen Maru Gothic", sans-serif';
-    ctx.fillText(`敵HP: ${remainingHpPercent}% 残り`, centerX, centerY - 95);
-
-    // IQセクション
-    ctx.fillStyle = '#8B7B9B';
-    ctx.font = '14px "Zen Maru Gothic", sans-serif';
-    ctx.fillText('あなたのIQ', centerX, centerY - 50);
-
-    // IQ数値（ラベンダー色）
-    ctx.font = 'bold 55px "Zen Maru Gothic", sans-serif';
-    ctx.fillStyle = '#9370DB';
-    ctx.fillText(iq, centerX, centerY + 25);
-
-    // コメント
-    ctx.font = '12px "Zen Maru Gothic", sans-serif';
-    ctx.fillStyle = '#5D4E6D';
-    ctx.fillText(comment, centerX, centerY + 70);
-
-    // 統計情報
-    ctx.font = '11px "Zen Maru Gothic", sans-serif';
-    ctx.fillStyle = '#8B7B9B';
-    const accuracy = totalQuizCount > 0 ? Math.round((correctAnswerCount / totalQuizCount) * 100) : 0;
-    ctx.fillText(`正解率: ${accuracy}%  間違い: ${wrongAnswerCount}回`, centerX, centerY + 110);
-
-    ctx.font = '12px "Zen Maru Gothic", sans-serif';
-    ctx.fillStyle = '#DA70D6';
-    ctx.fillText('♡ タップでタイトルへ ♡', centerX, centerY + 155);
+    // 結果画面オーバーレイ表示
+    showResultScreen(false);
 }
 
 function playSound(sound) {
