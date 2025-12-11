@@ -1088,9 +1088,12 @@ function gameClear() {
     animationFrameId = null;
     playSound(sounds.clear);
     setTimeout(() => playSound(sounds.congrats), 1500);
-    // エンディングBGM再生
-    sounds.ending.currentTime = 0;
-    if (!isMuted) sounds.ending.play().catch(() => {});
+
+    // エンディングBGM再生（少し遅延を入れてモバイル対応）
+    setTimeout(() => {
+        sounds.ending.currentTime = 0;
+        if (!isMuted) sounds.ending.play().catch(() => {});
+    }, 100);
 
     // 結果画面オーバーレイ表示
     showResultScreen(true);
@@ -1102,9 +1105,12 @@ function gameOver() {
     sounds.bgm.currentTime = 0;
     cancelAnimationFrame(animationFrameId);
     animationFrameId = null;
-    // エンディングBGM再生
-    sounds.ending.currentTime = 0;
-    if (!isMuted) sounds.ending.play().catch(() => {});
+
+    // エンディングBGM再生（少し遅延を入れてモバイル対応）
+    setTimeout(() => {
+        sounds.ending.currentTime = 0;
+        if (!isMuted) sounds.ending.play().catch(() => {});
+    }, 100);
 
     // 結果画面オーバーレイ表示
     showResultScreen(false);
